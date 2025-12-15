@@ -1,1 +1,10 @@
 @import "tailwindcss";
+@config "../../tailwind.config.ts";
+
+@theme {
+  --font-sans: 'Roboto', system-ui, sans-serif;
+}
+
+body {
+  @apply font-sans bg-surface-50 text-surface-900;
+}
