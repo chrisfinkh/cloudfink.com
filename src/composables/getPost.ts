@@ -11,8 +11,11 @@ const getPost = (id: string) => {
         try {
           const docRef = doc(db, "posts", id)
           const snapshot = await getDoc(docRef)
-          post.value = { id: snapshot.id, ...snapshot.data() } as Post
 
+          if (!snapshot.exists()) {
+            throw Error("That Post does not exist.")
+          }
+          post.value = { id: snapshot.id, ...snapshot.data() } as Post
         }
         catch(err) {
             const message = err instanceof Error ? err.message : String(err)
