@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
-import NavBar from './components/NavBar.vue';
-
+import { RouterView } from 'vue-router'
+import NavBar from './components/NavBar.vue'
 </script>
 
 <template>
-  <NavBar/>
-  <RouterView/>
+  <div class="min-h-screen bg-surface-50 font-sans">
+    <NavBar />
+    <main class="container py-8">
+      <RouterView />
+    </main>
+  </div>
 </template>
-
-<style>
-body {
-  text-align: center;
-  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-</style>
