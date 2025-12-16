@@ -1,5 +1,6 @@
 import Home from '../../views/HomeView.vue'
 import DetailsView from '../../views/DetailsView.vue'
+import CreateView from '../../views/CreateView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -14,13 +15,13 @@ const router = createRouter({
       name: 'Detail',
       path: '/posts/:id',
       component: DetailsView,
-      props: true
-    }
-    // {
-    //   name: "Create",
-    //   path: '/create',
-    //   component:
-    // }
+      props: true,
+    },
+    {
+      name: 'Create',
+      path: '/create',
+      component: CreateView,
+    },
   ],
 })
 
