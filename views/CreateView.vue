@@ -26,7 +26,6 @@
         validation-visibility="blur"
       />
 
-      <!-- Custom tag input (FormKit doesn't have built-in tag support) -->
       <div class="mb-5">
         <label for="tag" class="mb-1 block font-medium text-surface-800">
           Tags
@@ -57,18 +56,27 @@
         </div>
       </div>
 
-      <FormKit type="submit" label="Add Post" />
+      <div v-if="error" class="rounded bg-red-50 p-3 text-red-600">
+        {{ error }}
+      </div>
+
+      <FormKit type="submit" :label="isPending ? 'Saving...' : 'Add Post'" :disabled="isPending" />
     </FormKit>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import useCreatePost from '@/composables/useCreatePost'
 
 interface FormData {
   title: string
   body: string
 }
+
+const router = useRouter()
+const { error, isPending, createPost } = useCreatePost()
 
 const tag = ref<string>('')
 const tags = ref<string[]>([])
@@ -85,12 +93,15 @@ const removeTag = (tagToRemove: string) => {
   tags.value = tags.value.filter((t) => t !== tagToRemove)
 }
 
-const handleSubmit = (data: FormData) => {
-  const post = {
-    ...data,
+const handleSubmit = async (data: FormData) => {
+  const postId = await createPost({
+    title: data.title,
+    body: data.body,
     tags: tags.value,
+  })
+
+  if (postId) {
+    router.push({ name: 'Home' })
   }
-  console.log('Submitting post:', post)
-  // TODO: Submit to API
 }
 </script>
