@@ -3,6 +3,7 @@
 
 @theme {
   --font-sans: 'Roboto', system-ui, sans-serif;
+  --color-primary-400: #35B6FF;
 }
 
 body {
