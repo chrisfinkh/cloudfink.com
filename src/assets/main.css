@@ -3,9 +3,17 @@
 
 @theme {
   --font-sans: 'Roboto', system-ui, sans-serif;
-  --color-primary-400: #35B6FF;
+  --color-primary-400: #35b6ff;
 }
 
 body {
   @apply font-sans bg-surface-50 text-surface-900;
+}
+
+@utility scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

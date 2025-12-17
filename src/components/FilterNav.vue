@@ -1,5 +1,5 @@
 <template>
-  <nav class="mb-8 flex gap-2 overflow-x-auto scrollbar-none">
+  <nav class="mb-8 flex gap-2 overflow-x-auto scrollbar-hidden">
     <button
       @click="emit('filterChanged', null)"
       :class="[
