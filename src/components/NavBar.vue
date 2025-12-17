@@ -1,7 +1,11 @@
 <template>
   <header class="bg-white shadow-soft">
     <div class="container flex items-center justify-between py-4">
-      <h1 class="text-2xl font-bold text-primary">Blog</h1>
+              <RouterLink
+          :to="{ name: 'Home' }"
+        >
+        <h1 class="text-2xl font-bold text-primary">C529 Blog</h1>
+      </RouterLink>
       <nav class="flex gap-6">
         <RouterLink
           :to="{ name: 'Home' }"

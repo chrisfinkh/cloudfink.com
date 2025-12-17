@@ -13,7 +13,9 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix --cache",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "seed": "npx tsx scripts/seed.ts",
+    "seed:fresh": "npx tsx scripts/seed.ts --clear"
   },
   "dependencies": {
     "@fontsource/roboto": "^5.2.9",
@@ -39,6 +41,7 @@
     "npm-run-all2": "^8.0.4",
     "prettier": "3.6.2",
     "tailwindcss": "^4.1.18",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.0",
     "unplugin-fonts": "^1.4.0",
     "vite": "^7.1.11",
