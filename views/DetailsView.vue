@@ -25,6 +25,14 @@
       <div class="prose text-surface-800">
         <p class="whitespace-pre-wrap leading-relaxed">{{ post.body }}</p>
       </div>
+      <button
+          @click="deletePost"
+          class="mt-4 inline-flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-red-600 transition-colors hover:bg-red-100"
+          title="Delete Post"
+        >
+          <TrashIcon class="h-5 w-5" />
+          Delete
+      </button>
     </article>
 
     <div v-else-if="!error" class="flex justify-center py-12">
@@ -45,7 +53,11 @@
 
 <script setup lang="ts">
 import { VueSpinnerOval } from 'vue3-spinners'
+import { TrashIcon } from '@heroicons/vue/24/outline'
 import getPost from '@/composables/getPost'
+import { doc, deleteDoc } from 'firebase/firestore'
+import { db } from '@/firebase/config'
+import router from '@/router'
 
 const props = defineProps<{
   id: string
@@ -53,4 +65,9 @@ const props = defineProps<{
 
 const { post, error, load } = getPost(props.id)
 load()
+
+const deletePost = async () => {
+  await deleteDoc(doc(db, 'posts', props.id))
+  router.push({ name: 'Home' })
+}
 </script>
