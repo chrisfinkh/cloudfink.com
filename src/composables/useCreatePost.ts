@@ -1,9 +1,9 @@
 import { ref } from 'vue'
-import { collection, addDoc } from 'firebase/firestore'
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db } from '../firebase/config'
 import type { Post } from '@/types/Post'
 
-type NewPost = Omit<Post, 'id'>
+type NewPost = Omit<Post, 'id' | 'createdAt' | 'updatedAt'>
 
 const useCreatePost = () => {
   const error = ref<string | null>(null)
@@ -14,7 +14,11 @@ const useCreatePost = () => {
     isPending.value = true
 
     try {
-      const docRef = await addDoc(collection(db, 'posts'), post)
+      const docRef = await addDoc(collection(db, 'posts'), {
+        ...post,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      })
       isPending.value = false
       return docRef.id
     } catch (err) {
