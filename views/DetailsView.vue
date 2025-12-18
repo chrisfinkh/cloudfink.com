@@ -22,9 +22,7 @@
         </div>
       </header>
 
-      <div class="prose text-surface-800">
-        <p class="whitespace-pre-wrap leading-relaxed">{{ post.body }}</p>
-      </div>
+      <div class="prose text-surface-800" v-html="renderedBody"></div>
       <button
           @click="deletePost"
           class="mt-4 inline-flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-red-600 transition-colors hover:bg-red-100"
@@ -52,6 +50,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 import { VueSpinnerOval } from 'vue3-spinners'
 import { TrashIcon } from '@heroicons/vue/24/outline'
 import getPost from '@/composables/getPost'
@@ -65,6 +66,11 @@ const props = defineProps<{
 
 const { post, error, load } = getPost(props.id)
 load()
+
+const renderedBody = computed(() => {
+  if (!post.value?.body) return ''
+  return DOMPurify.sanitize(marked.parse(post.value.body) as string)
+})
 
 const deletePost = async () => {
   await deleteDoc(doc(db, 'posts', props.id))
