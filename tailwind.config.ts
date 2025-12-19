@@ -54,6 +54,25 @@ export default {
       fontFamily: {
         sans: ['Roboto', 'system-ui', 'sans-serif'],
       },
+      keyframes: {
+        toastHide: {
+          from: { opacity: '1' },
+          to: { opacity: '0' },
+        },
+        toastSlideIn: {
+          from: { transform: 'translateX(calc(100% + var(--viewport-padding)))' },
+          to: { transform: 'translateX(0)' },
+        },
+        toastSwipeOut: {
+          from: { transform: 'translateX(var(--radix-toast-swipe-end-x))' },
+          to: { transform: 'translateX(calc(100% + var(--viewport-padding)))' },
+        },
+      },
+      animation: {
+        toastHide: 'toastHide 100ms ease-in',
+        toastSlideIn: 'toastSlideIn 150ms cubic-bezier(0.16, 1, 0.3, 1)',
+        toastSwipeOut: 'toastSwipeOut 100ms ease-out',
+      },
     },
   },
   plugins: [],

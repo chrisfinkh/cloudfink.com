@@ -26,7 +26,7 @@
         </RouterLink>
         <button
           v-else
-          @click="logout"
+          @click="handleLogout"
           class="text-surface-800 transition-colors hover:text-primary"
         >
           Logout
@@ -38,6 +38,17 @@
 
 <script setup lang="ts">
 import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
 
 const { isLoggedIn, logout } = useAuth()
+const { showToast } = useToast()
+
+const handleLogout = async () => {
+  await logout()
+  showToast({
+    title: 'Goodbye!',
+    description: 'You have been logged out.',
+    type: 'info'
+  })
+}
 </script>

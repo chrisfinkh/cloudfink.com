@@ -56,12 +56,14 @@ import LoginForm from '@/components/LoginForm.vue'
 import SignupForm from '@/components/SignupForm.vue'
 import SetUsernameModal from '@/components/SetUsernameModal.vue'
 import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
 import googleLogo from '@/assets/google.svg'
 
 const showLogin = ref<boolean>(true)
 const showUsernameModal = ref(false)
 const router = useRouter()
-const { login, needsUsername } = useAuth()
+const { login, needsUsername, isLoggedIn } = useAuth()
+const { showToast } = useToast()
 
 const loginWithGoogle = async () => {
   await login()
@@ -69,13 +71,23 @@ const loginWithGoogle = async () => {
   // Check if user needs to set a username (new Google user)
   if (needsUsername.value) {
     showUsernameModal.value = true
-  } else {
+  } else if (isLoggedIn.value) {
+    showToast({
+      title: 'Welcome back!',
+      description: 'You have successfully logged in with Google.',
+      type: 'success'
+    })
     router.push({ name: 'Home' })
   }
 }
 
 const onUsernameSet = () => {
   showUsernameModal.value = false
+  showToast({
+    title: 'Welcome!',
+    description: 'Your account is all set up.',
+    type: 'success'
+  })
   router.push({ name: 'Home' })
 }
 </script>

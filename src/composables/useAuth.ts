@@ -36,12 +36,21 @@ const username = ref<string | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 
+// Promise that resolves when auth state change is fully processed
+let authStateResolve: (() => void) | null = null
+let authStatePromise: Promise<void> | null = null
+
 // Listen to auth state changes (runs once, shared across all components)
 let initialized = false
 const initAuth = () => {
   if (initialized) return
   initialized = true
   onAuthStateChanged(auth, async (u) => {
+    // Create a new promise for this auth state change
+    authStatePromise = new Promise((resolve) => {
+      authStateResolve = resolve
+    })
+
     user.value = u
     if (u) {
       // Fetch username from Firestore
@@ -51,6 +60,12 @@ const initAuth = () => {
       username.value = null
     }
     isLoading.value = false
+
+    // Resolve the promise now that auth state is fully processed
+    if (authStateResolve) {
+      authStateResolve()
+      authStateResolve = null
+    }
   })
 }
 
@@ -64,6 +79,10 @@ export const useAuth = () => {
     try {
       const provider = new GoogleAuthProvider()
       await signInWithPopup(auth, provider)
+      // Wait for auth state to be fully processed (including username fetch)
+      if (authStatePromise) {
+        await authStatePromise
+      }
     } catch (e) {
       error.value = getAuthErrorMessage(e as AuthError)
       console.error('Login error:', e)

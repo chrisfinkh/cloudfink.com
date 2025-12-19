@@ -39,17 +39,24 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useToast } from '@/composables/useToast'
 import { useRouter } from 'vue-router'
 
 const email = ref('')
 const password = ref('')
 
 const { loginWithEmail, error } = useAuth()
+const { showToast } = useToast()
 const router = useRouter()
 
 const handleSubmit = async () => {
   const success = await loginWithEmail(email.value, password.value)
   if (success) {
+    showToast({
+      title: 'Welcome back!',
+      description: 'You have successfully logged in.',
+      type: 'success'
+    })
     router.push({ name: 'Home' })
   }
 }

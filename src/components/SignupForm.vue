@@ -63,6 +63,7 @@
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useDisplayNameCheck } from '@/composables/useDisplayNameCheck'
+import { useToast } from '@/composables/useToast'
 import { useRouter } from 'vue-router'
 
 const { displayName, status: nameStatus, check: checkAvailability, isValid } = useDisplayNameCheck()
@@ -70,6 +71,7 @@ const email = ref('')
 const password = ref('')
 
 const { signUpWithEmail, claimUsername, error } = useAuth()
+const { showToast } = useToast()
 const router = useRouter()
 
 const handleSubmit = async () => {
@@ -80,6 +82,11 @@ const handleSubmit = async () => {
 
   const claimed = await claimUsername(displayName.value)
   if (claimed) {
+    showToast({
+      title: 'Welcome!',
+      description: 'Your account has been created successfully.',
+      type: 'success'
+    })
     router.push({ name: 'Home' })
   }
 }
