@@ -17,13 +17,13 @@
         >
           Create
         </RouterLink>
-        <button
+        <RouterLink
           v-if="!isLoggedIn"
-          @click="login"
+          :to="{ name: 'Login' }"
           class="text-surface-800 transition-colors hover:text-primary"
         >
           Login
-        </button>
+        </RouterLink>
         <button
           v-else
           @click="logout"
@@ -39,5 +39,5 @@
 <script setup lang="ts">
 import { useAuth } from '@/composables/useAuth'
 
-const { isLoggedIn, login, logout } = useAuth()
+const { isLoggedIn, logout } = useAuth()
 </script>

@@ -2,6 +2,8 @@ import { ref, computed, onMounted } from 'vue'
 import {
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   type User
@@ -49,12 +51,34 @@ export const useAuth = () => {
     }
   }
 
+  const loginWithEmail = async (email: string, password: string) => {
+    error.value = null
+    try {
+      await signInWithEmailAndPassword(auth, email, password)
+    } catch (e) {
+      error.value = (e as Error).message
+      console.error('Login error:', e)
+    }
+  }
+
+  const signUpWithEmail = async (email: string, password: string) => {
+    error.value = null
+    try {
+      await createUserWithEmailAndPassword(auth, email, password)
+    } catch (e) {
+      error.value = (e as Error).message
+      console.error('Signup error:', e)
+    }
+  }
+
   return {
     user,
     isLoggedIn,
     isLoading,
     error,
     login,
-    logout
+    logout,
+    loginWithEmail,
+    signUpWithEmail
   }
 }
