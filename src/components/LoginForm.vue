@@ -6,16 +6,6 @@
     @submit="handleSubmit"
   >
     <FormKit
-      v-model="name"
-      type="text"
-      name="name"
-      label="Display Name"
-      placeholder="Your name"
-      validation="required"
-      validation-visibility="blur"
-    />
-
-    <FormKit
       v-model="email"
       type="email"
       name="email"
@@ -35,6 +25,10 @@
       validation-visibility="blur"
     />
 
+    <div v-if="error" class="rounded bg-red-50 p-3 text-red-600">
+      {{ error }}
+    </div>
+
     <FormKit
       type="submit"
       label="Login"
@@ -47,15 +41,16 @@ import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 
-const name = ref('')
 const email = ref('')
 const password = ref('')
 
-const { loginWithEmail } = useAuth()
+const { loginWithEmail, error } = useAuth()
 const router = useRouter()
 
 const handleSubmit = async () => {
-  await loginWithEmail(email.value, password.value)
-  router.push({ name: 'Home' })
+  const success = await loginWithEmail(email.value, password.value)
+  if (success) {
+    router.push({ name: 'Home' })
+  }
 }
 </script>

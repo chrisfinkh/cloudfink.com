@@ -4,13 +4,35 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  updateProfile,
   signOut,
   onAuthStateChanged,
-  type User
+  type User,
+  type AuthError
 } from 'firebase/auth'
-import { auth } from '@/firebase/config'
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { auth, db } from '@/firebase/config'
+
+// Map Firebase error codes to user-friendly messages
+const getAuthErrorMessage = (error: AuthError): string => {
+  const errorMessages: Record<string, string> = {
+    'auth/invalid-credential': 'Invalid email or password. Please check your credentials or sign up for a new account.',
+    'auth/user-not-found': 'No account found with this email. Please sign up first.',
+    'auth/wrong-password': 'Incorrect password. Please try again.',
+    'auth/email-already-in-use': 'An account with this email already exists. Please log in instead.',
+    'auth/weak-password': 'Password is too weak. Please use at least 6 characters.',
+    'auth/invalid-email': 'Please enter a valid email address.',
+    'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+    'auth/network-request-failed': 'Network error. Please check your connection.',
+    'auth/popup-closed-by-user': 'Sign-in was cancelled.',
+    'auth/account-exists-with-different-credential': 'An account already exists with this email using a different sign-in method.'
+  }
+
+  return errorMessages[error.code] || error.message
+}
 
 const user = ref<User | null>(null)
+const username = ref<string | null>(null)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 
@@ -19,8 +41,15 @@ let initialized = false
 const initAuth = () => {
   if (initialized) return
   initialized = true
-  onAuthStateChanged(auth, (u) => {
+  onAuthStateChanged(auth, async (u) => {
     user.value = u
+    if (u) {
+      // Fetch username from Firestore
+      const userDoc = await getDoc(doc(db, 'users', u.uid))
+      username.value = userDoc.exists() ? userDoc.data().username : null
+    } else {
+      username.value = null
+    }
     isLoading.value = false
   })
 }
@@ -36,7 +65,7 @@ export const useAuth = () => {
       const provider = new GoogleAuthProvider()
       await signInWithPopup(auth, provider)
     } catch (e) {
-      error.value = (e as Error).message
+      error.value = getAuthErrorMessage(e as AuthError)
       console.error('Login error:', e)
     }
   }
@@ -51,34 +80,94 @@ export const useAuth = () => {
     }
   }
 
-  const loginWithEmail = async (email: string, password: string) => {
+  const loginWithEmail = async (email: string, password: string): Promise<boolean> => {
     error.value = null
     try {
       await signInWithEmailAndPassword(auth, email, password)
+      return true
     } catch (e) {
-      error.value = (e as Error).message
+      error.value = getAuthErrorMessage(e as AuthError)
       console.error('Login error:', e)
+      return false
     }
   }
 
-  const signUpWithEmail = async (email: string, password: string) => {
+  const signUpWithEmail = async (email: string, password: string, displayName: string): Promise<boolean> => {
     error.value = null
     try {
-      await createUserWithEmailAndPassword(auth, email, password)
+      const result = await createUserWithEmailAndPassword(auth, email, password)
+      await updateProfile(result.user, { displayName })
+      return true
     } catch (e) {
-      error.value = (e as Error).message
+      error.value = getAuthErrorMessage(e as AuthError)
       console.error('Signup error:', e)
+      return false
     }
   }
+
+  // Check if a username is available
+  const isUsernameAvailable = async (name: string): Promise<boolean> => {
+    const usernameDoc = await getDoc(doc(db, 'usernames', name.toLowerCase()))
+    return !usernameDoc.exists()
+  }
+
+  // Claim a username for the current user
+  const claimUsername = async (name: string): Promise<boolean> => {
+    error.value = null
+    if (!user.value) {
+      error.value = 'Must be logged in to claim username'
+      return false
+    }
+
+    const lowerName = name.toLowerCase()
+
+    try {
+      // Check availability first
+      if (!(await isUsernameAvailable(lowerName))) {
+        error.value = 'Username is already taken'
+        return false
+      }
+
+      // Save to usernames collection (for uniqueness lookup)
+      await setDoc(doc(db, 'usernames', lowerName), {
+        uid: user.value.uid,
+        createdAt: serverTimestamp()
+      })
+
+      // Save to users collection (for user profile)
+      await setDoc(doc(db, 'users', user.value.uid), {
+        username: lowerName,
+        displayName: name,
+        email: user.value.email,
+        createdAt: serverTimestamp()
+      })
+
+      // Update local state
+      username.value = lowerName
+
+      return true
+    } catch (e) {
+      error.value = (e as Error).message
+      console.error('Claim username error:', e)
+      return false
+    }
+  }
+
+  // Check if current user needs to set a username
+  const needsUsername = computed(() => isLoggedIn.value && !username.value)
 
   return {
     user,
+    username,
     isLoggedIn,
     isLoading,
     error,
+    needsUsername,
     login,
     logout,
     loginWithEmail,
-    signUpWithEmail
+    signUpWithEmail,
+    isUsernameAvailable,
+    claimUsername
   }
 }

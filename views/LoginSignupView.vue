@@ -41,6 +41,11 @@
         Continue with Google
       </button>
     </div>
+
+    <SetUsernameModal
+      v-if="showUsernameModal"
+      @complete="onUsernameSet"
+    />
   </div>
 </template>
 
@@ -49,15 +54,28 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import LoginForm from '@/components/LoginForm.vue'
 import SignupForm from '@/components/SignupForm.vue'
+import SetUsernameModal from '@/components/SetUsernameModal.vue'
 import { useAuth } from '@/composables/useAuth'
 import googleLogo from '@/assets/google.svg'
 
 const showLogin = ref<boolean>(true)
+const showUsernameModal = ref(false)
 const router = useRouter()
-const { login } = useAuth()
+const { login, needsUsername } = useAuth()
 
 const loginWithGoogle = async () => {
   await login()
+
+  // Check if user needs to set a username (new Google user)
+  if (needsUsername.value) {
+    showUsernameModal.value = true
+  } else {
+    router.push({ name: 'Home' })
+  }
+}
+
+const onUsernameSet = () => {
+  showUsernameModal.value = false
   router.push({ name: 'Home' })
 }
 </script>

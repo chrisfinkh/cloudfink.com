@@ -5,6 +5,28 @@
     form-class="space-y-6"
     @submit="handleSubmit"
   >
+    <div>
+      <FormKit
+        v-model="displayName"
+        type="text"
+        name="displayName"
+        label="Display Name"
+        placeholder="Your name"
+        validation="required|length:2,50"
+        validation-visibility="blur"
+        @blur="checkAvailability"
+      />
+      <p v-if="nameStatus === 'checking'" class="mt-1 text-sm text-surface-300">
+        Checking availability...
+      </p>
+      <p v-else-if="nameStatus === 'available'" class="mt-1 text-sm text-green-600">
+        Name is available
+      </p>
+      <p v-else-if="nameStatus === 'taken'" class="mt-1 text-sm text-red-600">
+        Name is already taken
+      </p>
+    </div>
+
     <FormKit
       v-model="email"
       type="email"
@@ -25,9 +47,14 @@
       validation-visibility="blur"
     />
 
+    <div v-if="error" class="rounded bg-red-50 p-3 text-red-600">
+      {{ error }}
+    </div>
+
     <FormKit
       type="submit"
       label="Signup"
+      :disabled="nameStatus !== 'available'"
     />
   </FormKit>
 </template>
@@ -35,16 +62,25 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useDisplayNameCheck } from '@/composables/useDisplayNameCheck'
 import { useRouter } from 'vue-router'
 
+const { displayName, status: nameStatus, check: checkAvailability, isValid } = useDisplayNameCheck()
 const email = ref('')
 const password = ref('')
 
-const { signUpWithEmail } = useAuth()
+const { signUpWithEmail, claimUsername, error } = useAuth()
 const router = useRouter()
 
 const handleSubmit = async () => {
-  await signUpWithEmail(email.value, password.value)
-  router.push({ name: 'Home' })
+  if (!isValid()) return
+
+  const success = await signUpWithEmail(email.value, password.value, displayName.value)
+  if (!success) return
+
+  const claimed = await claimUsername(displayName.value)
+  if (claimed) {
+    router.push({ name: 'Home' })
+  }
 }
 </script>
