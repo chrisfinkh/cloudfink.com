@@ -38,10 +38,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
 import { useToast } from '@/composables/useToast'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+const { t } = useI18n()
+const route = useRoute()
 const email = ref('')
 const password = ref('')
 
@@ -53,11 +56,11 @@ const handleSubmit = async () => {
   const success = await loginWithEmail(email.value, password.value)
   if (success) {
     showToast({
-      title: 'Welcome back!',
-      description: 'You have successfully logged in.',
+      title: t('toast.loginSuccess.title'),
+      description: t('toast.loginSuccess.description'),
       type: 'success'
     })
-    router.push({ name: 'Home' })
+    router.push({ name: 'Home', params: { locale: route.params.locale } })
   }
 }
 </script>

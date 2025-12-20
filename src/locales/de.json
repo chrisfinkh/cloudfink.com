@@ -1,0 +1,67 @@
+{
+  "common": {
+    "home": "Startseite",
+    "create": "Erstellen",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "signup": "Registrieren",
+    "or": "oder",
+    "saving": "Speichern...",
+    "addPost": "Beitrag hinzufügen"
+  },
+  "auth": {
+    "noAccount": "Noch kein Konto?",
+    "alreadyRegistered": "Bereits registriert?",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "displayName": "Anzeigename",
+    "emailPlaceholder": "du{'@'}beispiel.de",
+    "passwordPlaceholder": "Dein Passwort",
+    "choosePassword": "Passwort wählen",
+    "namePlaceholder": "Dein Name",
+    "checkingAvailability": "Verfügbarkeit wird geprüft...",
+    "nameAvailable": "Name ist verfügbar",
+    "nameTaken": "Name ist bereits vergeben"
+  },
+  "createPost": {
+    "title": "Beitrag erstellen",
+    "postTitle": "Titel",
+    "postTitlePlaceholder": "Beitragstitel eingeben",
+    "content": "Inhalt",
+    "contentPlaceholder": "Schreibe deinen Beitrag...",
+    "tags": "Tags",
+    "tagsPlaceholder": "Enter drücken um Tag hinzuzufügen"
+  },
+  "home": {
+    "latestPosts": "Neueste Beiträge",
+    "noPostsFound": "Keine Beiträge für diesen Tag gefunden."
+  },
+  "detail": {
+    "backToPosts": "Zurück zu Beiträgen",
+    "returnToHome": "Zur Startseite",
+    "delete": "Löschen"
+  },
+  "toast": {
+    "loginSuccess": {
+      "title": "Willkommen zurück!",
+      "description": "Du hast dich erfolgreich angemeldet."
+    },
+    "loginGoogleSuccess": {
+      "title": "Willkommen zurück!",
+      "description": "Du hast dich erfolgreich mit Google angemeldet."
+    },
+    "signupSuccess": {
+      "title": "Willkommen!",
+      "description": "Dein Konto wurde erfolgreich erstellt."
+    },
+    "usernameSetSuccess": {
+      "title": "Willkommen!",
+      "description": "Dein Konto ist jetzt eingerichtet."
+    },
+    "logoutSuccess": {
+      "title": "Auf Wiedersehen!",
+      "description": "Du wurdest abgemeldet."
+    }
+  }
+}

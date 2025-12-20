@@ -61,11 +61,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAuth } from '@/composables/useAuth'
 import { useDisplayNameCheck } from '@/composables/useDisplayNameCheck'
 import { useToast } from '@/composables/useToast'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
+const { t } = useI18n()
+const route = useRoute()
 const { displayName, status: nameStatus, check: checkAvailability, isValid } = useDisplayNameCheck()
 const email = ref('')
 const password = ref('')
@@ -83,11 +86,11 @@ const handleSubmit = async () => {
   const claimed = await claimUsername(displayName.value)
   if (claimed) {
     showToast({
-      title: 'Welcome!',
-      description: 'Your account has been created successfully.',
+      title: t('toast.signupSuccess.title'),
+      description: t('toast.signupSuccess.description'),
       type: 'success'
     })
-    router.push({ name: 'Home' })
+    router.push({ name: 'Home', params: { locale: route.params.locale } })
   }
 }
 </script>
