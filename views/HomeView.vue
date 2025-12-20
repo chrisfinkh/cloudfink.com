@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="mb-8 text-3xl font-bold text-surface-800">Latest Posts</h1>
+    <h1 class="mb-8 text-3xl font-bold text-surface-800">{{ $t('home.latestPosts') }}</h1>
     <FilterNav
       v-if="allTags.length"
       :tags="allTags"
@@ -12,7 +12,7 @@
       <VueSpinnerOval :size="50" color="var(--color-primary-400)" />
     </div>
     <p v-else-if="!loading && !filteredPosts.length" class="text-surface-500">
-      No posts found for this tag.
+      {{ $t('home.noPostsFound') }}
     </p>
     <p v-if="error" class="mt-4 rounded bg-red-50 p-3 text-red-600">{{ error }}</p>
   </div>

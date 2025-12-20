@@ -1,11 +1,11 @@
 <template>
   <div class="mx-auto max-w-3xl">
     <RouterLink
-      :to="{ name: 'Home' }"
+      :to="{ name: 'Home', params: { locale: $route.params.locale } }"
       class="mb-6 inline-flex items-center gap-1 text-sm text-primary hover:text-primary-600"
     >
       <span aria-hidden="true">←</span>
-      Back to posts
+      {{ $t('detail.backToPosts') }}
     </RouterLink>
 
     <article v-if="post" class="rounded-lg bg-white p-8 shadow-card">
@@ -40,10 +40,10 @@
     <div v-if="error" class="rounded-lg bg-red-50 p-6 text-center">
       <p class="text-red-600">{{ error }}</p>
       <RouterLink
-        :to="{ name: 'Home' }"
+        :to="{ name: 'Home', params: { locale: $route.params.locale } }"
         class="mt-4 inline-block text-primary hover:text-primary-600"
       >
-        Return to home
+        {{ $t('detail.returnToHome') }}
       </RouterLink>
     </div>
   </div>
@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { VueSpinnerOval } from 'vue3-spinners'
@@ -58,11 +59,13 @@ import { TrashIcon } from '@heroicons/vue/24/outline'
 import getPost from '@/composables/getPost'
 import { doc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
-import router from '@/router'
 
 const props = defineProps<{
   id: string
 }>()
+
+const route = useRoute()
+const router = useRouter()
 
 const { post, error, load } = getPost(props.id)
 load()
@@ -74,6 +77,6 @@ const renderedBody = computed(() => {
 
 const deletePost = async () => {
   await deleteDoc(doc(db, 'posts', props.id))
-  router.push({ name: 'Home' })
+  router.push({ name: 'Home', params: { locale: route.params.locale } })
 }
 </script>

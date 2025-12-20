@@ -1,0 +1,67 @@
+{
+  "common": {
+    "home": "Home",
+    "create": "Create",
+    "login": "Login",
+    "logout": "Logout",
+    "signup": "Sign Up",
+    "or": "or",
+    "saving": "Saving...",
+    "addPost": "Add Post"
+  },
+  "auth": {
+    "noAccount": "No account yet?",
+    "alreadyRegistered": "Already registered?",
+    "continueWithGoogle": "Continue with Google",
+    "email": "Email",
+    "password": "Password",
+    "displayName": "Display Name",
+    "emailPlaceholder": "you{'@'}example.com",
+    "passwordPlaceholder": "Your password",
+    "choosePassword": "Choose a password",
+    "namePlaceholder": "Your name",
+    "checkingAvailability": "Checking availability...",
+    "nameAvailable": "Name is available",
+    "nameTaken": "Name is already taken"
+  },
+  "createPost": {
+    "title": "Create Post",
+    "postTitle": "Title",
+    "postTitlePlaceholder": "Enter post title",
+    "content": "Content",
+    "contentPlaceholder": "Write your post content...",
+    "tags": "Tags",
+    "tagsPlaceholder": "Press Enter to add a tag"
+  },
+  "home": {
+    "latestPosts": "Latest Posts",
+    "noPostsFound": "No posts found for this tag."
+  },
+  "detail": {
+    "backToPosts": "Back to posts",
+    "returnToHome": "Return to home",
+    "delete": "Delete"
+  },
+  "toast": {
+    "loginSuccess": {
+      "title": "Welcome back!",
+      "description": "You have successfully logged in."
+    },
+    "loginGoogleSuccess": {
+      "title": "Welcome back!",
+      "description": "You have successfully logged in with Google."
+    },
+    "signupSuccess": {
+      "title": "Welcome!",
+      "description": "Your account has been created successfully."
+    },
+    "usernameSetSuccess": {
+      "title": "Welcome!",
+      "description": "Your account is all set up."
+    },
+    "logoutSuccess": {
+      "title": "Goodbye!",
+      "description": "You have been logged out."
+    }
+  }
+}
