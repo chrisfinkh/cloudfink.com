@@ -1,9 +1,9 @@
 import { ref } from 'vue'
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { db } from '../firebase/config'
+import { db, auth } from '../firebase/config'
 import type { Post } from '@/types/Post'
 
-type NewPost = Omit<Post, 'id' | 'createdAt' | 'updatedAt'>
+type NewPost = Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'authorId'>
 
 const useCreatePost = () => {
   const error = ref<string | null>(null)
@@ -14,8 +14,16 @@ const useCreatePost = () => {
     isPending.value = true
 
     try {
+      const currentUser = auth.currentUser
+      if (!currentUser) {
+        error.value = 'You must be logged in to create a post'
+        isPending.value = false
+        return null
+      }
+
       const docRef = await addDoc(collection(db, 'posts'), {
         ...post,
+        authorId: currentUser.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       })

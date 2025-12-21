@@ -11,6 +11,9 @@
     <article v-if="post" class="rounded-lg bg-white p-8 shadow-card">
       <header class="mb-6">
         <h1 class="text-3xl font-bold text-surface-800">{{ post.title }}</h1>
+        <p class="mt-2 text-sm text-surface-500">
+          by {{ author?.displayName || 'Unknown' }}
+        </p>
         <div v-if="post.tags?.length" class="mt-4 flex flex-wrap gap-2">
           <span
             v-for="tag in post.tags"
@@ -23,13 +26,22 @@
       </header>
 
       <div class="prose text-surface-800" v-html="renderedBody"></div>
+
+      <!-- Delete button: only show when logged in -->
       <button
-          @click="deletePost"
-          class="mt-4 inline-flex items-center gap-2 rounded-lg bg-red-50 px-4 py-2 text-red-600 transition-colors hover:bg-red-100"
-          title="Delete Post"
-        >
-          <TrashIcon class="h-5 w-5" />
-          Delete
+        v-if="isLoggedIn"
+        @click="deletePost"
+        :disabled="!isAuthor"
+        :class="[
+          'mt-4 inline-flex items-center gap-2 rounded-lg px-4 py-2 transition-colors',
+          isAuthor
+            ? 'bg-red-50 text-red-600 hover:bg-red-100 cursor-pointer'
+            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+        ]"
+        :title="isAuthor ? 'Delete Post' : 'Only the author can delete this post'"
+      >
+        <TrashIcon class="h-5 w-5" />
+        Delete
       </button>
     </article>
 
@@ -57,6 +69,8 @@ import DOMPurify from 'dompurify'
 import { VueSpinnerOval } from 'vue3-spinners'
 import { TrashIcon } from '@heroicons/vue/24/outline'
 import getPost from '@/composables/getPost'
+import { useAuth } from '@/composables/useAuth'
+import { useAuthor } from '@/composables/useAuthors'
 import { doc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
 
@@ -69,6 +83,15 @@ const router = useRouter()
 
 const { post, error, load } = getPost(props.id)
 load()
+
+const { user, isLoggedIn } = useAuth()
+
+const authorId = computed(() => post.value?.authorId)
+const { author } = useAuthor(authorId)
+
+const isAuthor = computed(() => {
+  return user.value && post.value && user.value.uid === post.value.authorId
+})
 
 const renderedBody = computed(() => {
   if (!post.value?.body) return ''

@@ -12,6 +12,7 @@
           {{ $t('common.home') }}
         </RouterLink>
         <RouterLink
+          v-if="isLoggedIn"
           :to="{ name: 'Create', params: { locale } }"
           class="text-surface-800 transition-colors hover:text-primary"
         >
