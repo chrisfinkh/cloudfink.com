@@ -5,6 +5,7 @@ export type Post = {
   title: string
   body: string
   tags: string[]
+  authorId: string
   createdAt: Timestamp
   updatedAt: Timestamp
 }

@@ -12,6 +12,7 @@
           Home
         </RouterLink>
         <RouterLink
+          v-if="isLoggedIn"
           :to="{ name: 'Create' }"
           class="text-surface-800 transition-colors hover:text-primary"
         >

@@ -8,6 +8,8 @@
         </RouterLink>
       </h2>
 
+      <p class="mt-1 text-xs text-surface-400">by {{ authorName }}</p>
+
       <p class="mt-3 flex-1 text-surface-300">{{ snippet }}</p>
 
       <div v-if="post.tags?.length" class="mt-4 flex flex-wrap gap-2">
@@ -33,6 +35,7 @@ import type { Post } from '@/types/Post'
 
 const props = defineProps<{
   post: Post
+  authorName: string
 }>()
 
 const snippet = computed(() => {
