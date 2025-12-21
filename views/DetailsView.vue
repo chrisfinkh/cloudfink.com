@@ -27,22 +27,33 @@
 
       <div class="prose text-surface-800" v-html="renderedBody"></div>
 
-      <!-- Delete button: only show when logged in -->
-      <button
-        v-if="isLoggedIn"
-        @click="deletePost"
-        :disabled="!isAuthor"
-        :class="[
-          'mt-4 inline-flex items-center gap-2 rounded-lg px-4 py-2 transition-colors',
-          isAuthor
-            ? 'bg-red-50 text-red-600 hover:bg-red-100 cursor-pointer'
-            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-        ]"
-        :title="isAuthor ? 'Delete Post' : 'Only the author can delete this post'"
-      >
-        <TrashIcon class="h-5 w-5" />
-        Delete
-      </button>
+      <div v-if="isLoggedIn" class="mt-6 flex gap-3">
+        <RouterLink
+          :to="{ name: 'Edit', params: { locale: $route.params.locale, id: id } }"
+          class="inline-flex items-center gap-2 rounded-lg px-4 py-2 transition-colors"
+          :class="isAuthor
+            ? 'bg-primary-50 text-primary-600 hover:bg-primary-100'
+            : 'cursor-not-allowed bg-surface-100 text-surface-400'"
+          :title="$t('detail.edit')"
+          :aria-disabled="!isAuthor"
+          @click.prevent="isAuthor ? $router.push({ name: 'Edit', params: { locale: $route.params.locale, id: id } }) : null"
+        >
+          <PencilIcon class="h-5 w-5" />
+          {{ $t('detail.edit') }}
+        </RouterLink>
+        <button
+          @click="deletePost"
+          class="inline-flex items-center gap-2 rounded-lg px-4 py-2 transition-colors"
+          :class="isAuthor
+            ? 'bg-red-50 text-red-600 hover:bg-red-100'
+            : 'cursor-not-allowed bg-surface-100 text-surface-400'"
+          :title="$t('detail.delete')"
+          :disabled="!isAuthor"
+        >
+          <TrashIcon class="h-5 w-5" />
+          {{ $t('detail.delete') }}
+        </button>
+      </div>
     </article>
 
     <div v-else-if="!error" class="flex justify-center py-12">
@@ -67,7 +78,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { VueSpinnerOval } from 'vue3-spinners'
-import { TrashIcon } from '@heroicons/vue/24/outline'
+import { TrashIcon, PencilIcon } from '@heroicons/vue/24/outline'
 import getPost from '@/composables/getPost'
 import { useAuth } from '@/composables/useAuth'
 import { useAuthor } from '@/composables/useAuthors'
@@ -90,7 +101,7 @@ const authorId = computed(() => post.value?.authorId)
 const { author } = useAuthor(authorId)
 
 const isAuthor = computed(() => {
-  return user.value && post.value && user.value.uid === post.value.authorId
+  return isLoggedIn.value && post.value?.authorId === user.value?.uid
 })
 
 const renderedBody = computed(() => {

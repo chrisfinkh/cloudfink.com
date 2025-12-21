@@ -1,6 +1,7 @@
 import Home from '../../views/HomeView.vue'
 import DetailsView from '../../views/DetailsView.vue'
 import CreateView from '../../views/CreateView.vue'
+import EditView from '../../views/EditView.vue'
 import LoginSignupView from '../../views/LoginSignupView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { i18n, SUPPORTED_LOCALES, type LocaleCode } from '@/i18n'
@@ -21,6 +22,12 @@ const localeRoutes = [
     name: 'Create',
     path: 'create',
     component: CreateView,
+  },
+  {
+    name: 'Edit',
+    path: 'posts/:id/edit',
+    component: EditView,
+    props: true,
   },
   {
     name: 'Login',

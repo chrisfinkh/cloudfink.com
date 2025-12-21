@@ -7,7 +7,8 @@
     "signup": "Sign Up",
     "or": "or",
     "saving": "Saving...",
-    "addPost": "Add Post"
+    "addPost": "Add Post",
+    "saveChanges": "Save Changes"
   },
   "auth": {
     "noAccount": "No account yet?",
@@ -40,7 +41,17 @@
   "detail": {
     "backToPosts": "Back to posts",
     "returnToHome": "Return to home",
-    "delete": "Delete"
+    "delete": "Delete",
+    "edit": "Edit"
+  },
+  "editPost": {
+    "title": "Edit Post",
+    "postTitle": "Title",
+    "postTitlePlaceholder": "Enter post title",
+    "content": "Content",
+    "contentPlaceholder": "Write your post content...",
+    "tags": "Tags",
+    "tagsPlaceholder": "Press Enter to add a tag"
   },
   "toast": {
     "loginSuccess": {
