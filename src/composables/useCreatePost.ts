@@ -13,17 +13,16 @@ const useCreatePost = () => {
     error.value = null
     isPending.value = true
 
-    try {
-      const currentUser = auth.currentUser
-      if (!currentUser) {
-        error.value = 'You must be logged in to create a post'
-        isPending.value = false
-        return null
-      }
+    if (!auth.currentUser) {
+      error.value = 'You must be logged in to create a post'
+      isPending.value = false
+      return null
+    }
 
+    try {
       const docRef = await addDoc(collection(db, 'posts'), {
         ...post,
-        authorId: currentUser.uid,
+        authorId: auth.currentUser.uid,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       })

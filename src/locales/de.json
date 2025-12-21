@@ -7,7 +7,8 @@
     "signup": "Registrieren",
     "or": "oder",
     "saving": "Speichern...",
-    "addPost": "Beitrag hinzufügen"
+    "addPost": "Beitrag hinzufügen",
+    "saveChanges": "Änderungen speichern"
   },
   "auth": {
     "noAccount": "Noch kein Konto?",
@@ -40,7 +41,17 @@
   "detail": {
     "backToPosts": "Zurück zu Beiträgen",
     "returnToHome": "Zur Startseite",
-    "delete": "Löschen"
+    "delete": "Löschen",
+    "edit": "Bearbeiten"
+  },
+  "editPost": {
+    "title": "Beitrag bearbeiten",
+    "postTitle": "Titel",
+    "postTitlePlaceholder": "Beitragstitel eingeben",
+    "content": "Inhalt",
+    "contentPlaceholder": "Schreibe deinen Beitrag...",
+    "tags": "Tags",
+    "tagsPlaceholder": "Enter drücken um Tag hinzuzufügen"
   },
   "toast": {
     "loginSuccess": {
