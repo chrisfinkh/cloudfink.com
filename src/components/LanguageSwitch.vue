@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import {
@@ -41,21 +40,15 @@ import {
 import { ChevronDownIcon, CheckIcon, LanguageIcon } from '@heroicons/vue/20/solid'
 import { SUPPORTED_LOCALES, type LocaleCode } from '@/i18n'
 
-// Pre-load flags at module level (only once)
-const flagUrls: Record<string, string> = Object.fromEntries(
-  SUPPORTED_LOCALES.map((loc) => [
-    loc.country,
-    new URL(`../../node_modules/circle-flags/flags/${loc.country}.svg`, import.meta.url).href
-  ])
-)
+// Use flags from public/ folder for reliable static serving
+const flagUrls: Record<string, string> = {
+  gb: '/flags/gb.svg',
+  de: '/flags/de.svg'
+}
 
 const { locale } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
-
-const currentLocale = computed(() =>
-  SUPPORTED_LOCALES.find((l) => l.code === locale.value)
-)
 
 const setLocale = (code: LocaleCode) => {
   const currentPath = route.fullPath

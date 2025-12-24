@@ -8,7 +8,7 @@
         </RouterLink>
       </h2>
 
-      <p class="mt-1 text-xs text-surface-400">by {{ authorName }}</p>
+      <p class="mt-1 text-xs text-surface-400">{{ t('home.byAuthor', { author: authorName }) }}</p>
 
       <p class="mt-3 flex-1 text-surface-300">{{ snippet }}</p>
 
@@ -31,7 +31,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Post } from '@/types/Post'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   post: Post
