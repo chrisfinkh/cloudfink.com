@@ -1,48 +1,86 @@
-# vue3-blog
+# Vue 3 Blog
 
-This template should help get you started developing with Vue 3 in Vite.
+A modern blog application built with Vue 3, Firebase, and Tailwind CSS. Features authentication, internationalization, and Markdown support.
 
-## Recommended IDE Setup
+## Features
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Authentication** - Google and Email/Password login via Firebase Auth
+- **Internationalization** - English and German with language switcher
+- **Markdown Posts** - Write posts in Markdown with live rendering
+- **Author Controls** - Edit and delete your own posts
+- **Responsive Design** - Mobile-friendly layout with Tailwind CSS
 
-## Recommended Browser Setup
+## Tech Stack
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+- Vue 3 + Vite + TypeScript
+- Tailwind CSS v4
+- Firebase (Firestore + Auth)
+- vue-i18n
+- radix-vue
+- marked + DOMPurify
 
-## Type Support for `.vue` Imports in TS
+## Getting Started
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### Prerequisites
 
-## Customize configuration
+- Node.js 18+
+- Firebase project with Firestore and Authentication enabled
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+### Installation
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Firebase Setup
+
+The Firebase config is included in the repo. If you want to use your own Firebase project:
+
+1. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+2. Enable **Google** and **Email/Password** authentication providers
+3. Create a Firestore database
+4. Update `src/firebase/firebaseConfig.ts` with your config
+5. Deploy security rules (see `firestore.rules`)
+
+### Development
 
 ```sh
 npm run dev
 ```
 
-### Type-Check, Compile and Minify for Production
+### Database Seeding
+
+```sh
+npm run seed        # Add sample posts
+npm run seed:fresh  # Clear and reseed
+```
+
+### Production Build
 
 ```sh
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+### Linting
 
 ```sh
 npm run lint
 ```
+
+## Project Structure
+
+```
+src/
+├── components/       # UI components
+├── composables/      # Reusable logic (useAuth, useToast, etc.)
+├── firebase/         # Firebase configuration
+├── locales/          # i18n translations (en.json, de.json)
+├── types/            # TypeScript types
+├── i18n.ts           # vue-i18n setup
+views/                # Page components
+public/flags/         # Language flag icons
+```
+
+## License
+
+MIT

@@ -36,7 +36,8 @@
   },
   "home": {
     "latestPosts": "Neueste Beiträge",
-    "noPostsFound": "Keine Beiträge für diesen Tag gefunden."
+    "noPostsFound": "Keine Beiträge für diesen Tag gefunden.",
+    "byAuthor": "von {author}"
   },
   "detail": {
     "backToPosts": "Zurück zu Beiträgen",
