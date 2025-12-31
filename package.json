@@ -15,7 +15,9 @@
     "lint": "eslint . --fix --cache",
     "format": "prettier --write src/",
     "seed": "npx tsx scripts/seed.ts",
-    "seed:fresh": "npx tsx scripts/seed.ts --clear"
+    "seed:fresh": "npx tsx scripts/seed.ts --clear",
+    "seed:emu": "npx tsx scripts/seed.ts --emulator",
+    "seed:emu:fresh": "npx tsx scripts/seed.ts --emulator --clear"
   },
   "dependencies": {
     "@fontsource/roboto": "^5.2.9",

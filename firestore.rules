@@ -9,10 +9,17 @@ service cloud.firestore {
       allow read: if true;
 
       // Only authenticated users can create posts
-      allow create: if request.auth != null;
+      // Must set authorId to their own UID
+      allow create: if request.auth != null
+        && request.resource.data.authorId == request.auth.uid;
 
       // Only the post author can update or delete
-      allow update, delete: if request.auth != null
+      // Cannot change authorId field
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.authorId
+        && request.resource.data.authorId == resource.data.authorId;
+
+      allow delete: if request.auth != null
         && request.auth.uid == resource.data.authorId;
     }
 

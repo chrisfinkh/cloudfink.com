@@ -3,23 +3,38 @@ import { getFirestore } from 'firebase-admin/firestore'
 import { readFileSync, existsSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
+import { firebaseConfig } from '../src/firebase/firebaseConfig'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-// Load service account key
-const serviceAccountPath = join(__dirname, '../serviceAccountKey.json')
-if (!existsSync(serviceAccountPath)) {
-  console.error('Error: serviceAccountKey.json not found!')
-  console.error('Download it from Firebase Console → Project Settings → Service Accounts')
-  process.exit(1)
+// Check if running against emulator
+const useEmulator = process.env.FIRESTORE_EMULATOR_HOST || process.argv.includes('--emulator')
+
+if (useEmulator) {
+  // Set emulator host if --emulator flag used
+  process.env.FIRESTORE_EMULATOR_HOST = process.env.FIRESTORE_EMULATOR_HOST || 'localhost:8080'
+  console.log(`🔧 Using Firestore emulator at ${process.env.FIRESTORE_EMULATOR_HOST}`)
+
+  // Initialize without credentials for emulator
+  initializeApp({ projectId: firebaseConfig.projectId })
+} else {
+  // Load service account key for production
+  const serviceAccountPath = join(__dirname, '../serviceAccountKey.json')
+  if (!existsSync(serviceAccountPath)) {
+    console.error('Error: serviceAccountKey.json not found!')
+    console.error('Download it from Firebase Console → Project Settings → Service Accounts')
+    console.error('Or use --emulator flag to seed the emulator instead')
+    process.exit(1)
+  }
+
+  const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf-8'))
+  console.log('🔥 Using production Firestore')
+
+  initializeApp({
+    credential: cert(serviceAccount)
+  })
 }
-
-const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf-8'))
-
-initializeApp({
-  credential: cert(serviceAccount)
-})
 
 const db = getFirestore()
 
