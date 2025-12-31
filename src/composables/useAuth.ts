@@ -154,10 +154,10 @@ export const useAuth = () => {
       })
 
       // Save to users collection (for user profile)
+      // Note: email not stored here - it's private in Firebase Auth
       await setDoc(doc(db, 'users', user.value.uid), {
         username: lowerName,
         displayName: name,
-        email: user.value.email,
         createdAt: serverTimestamp()
       })
 
