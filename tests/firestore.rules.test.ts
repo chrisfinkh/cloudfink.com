@@ -34,23 +34,96 @@ beforeEach(async () => {
 
 describe('Posts Collection', () => {
   describe('read rules', () => {
-    it('allows anyone to read posts', async () => {
+    it('allows anyone to read published posts', async () => {
+      // Setup: create a published post
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'posts', 'published-post'), {
+          title: 'Published',
+          authorId: 'alice',
+          status: 'published',
+        })
+      })
+
       const unauthed = testEnv.unauthenticatedContext()
       const db = unauthed.firestore()
 
-      await assertSucceeds(getDoc(doc(db, 'posts', 'test-post')))
+      await assertSucceeds(getDoc(doc(db, 'posts', 'published-post')))
     })
 
-    it('allows anyone to list posts', async () => {
+    it('denies unauthenticated users from reading pending posts', async () => {
+      // Setup: create a pending post
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'posts', 'pending-post'), {
+          title: 'Pending',
+          authorId: 'alice',
+          status: 'pending',
+        })
+      })
+
       const unauthed = testEnv.unauthenticatedContext()
       const db = unauthed.firestore()
 
-      await assertSucceeds(getDocs(collection(db, 'posts')))
+      await assertFails(getDoc(doc(db, 'posts', 'pending-post')))
+    })
+
+    it('allows author to read their own pending post', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'posts', 'pending-post'), {
+          title: 'Pending',
+          authorId: 'alice',
+          status: 'pending',
+        })
+      })
+
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertSucceeds(getDoc(doc(db, 'posts', 'pending-post')))
+    })
+
+    it('denies other users from reading pending posts', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'posts', 'pending-post'), {
+          title: 'Pending',
+          authorId: 'alice',
+          status: 'pending',
+        })
+      })
+
+      const bob = testEnv.authenticatedContext('bob')
+      const db = bob.firestore()
+
+      await assertFails(getDoc(doc(db, 'posts', 'pending-post')))
+    })
+
+    it('allows admin to read pending posts', async () => {
+      // Setup: create admin user and pending post
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'admin'), {
+          username: 'admin',
+          isAdmin: true,
+        })
+        await setDoc(doc(db, 'posts', 'pending-post'), {
+          title: 'Pending',
+          authorId: 'alice',
+          status: 'pending',
+        })
+      })
+
+      const admin = testEnv.authenticatedContext('admin')
+      const db = admin.firestore()
+
+      await assertSucceeds(getDoc(doc(db, 'posts', 'pending-post')))
     })
   })
 
   describe('create rules', () => {
-    it('allows authenticated user to create post with their own authorId', async () => {
+    it('allows authenticated user to create post with pending status', async () => {
       const alice = testEnv.authenticatedContext('alice')
       const db = alice.firestore()
 
@@ -59,6 +132,35 @@ describe('Posts Collection', () => {
           title: 'Test Post',
           body: 'Content',
           authorId: 'alice',
+          status: 'pending',
+        })
+      )
+    })
+
+    it('denies creating post with published status', async () => {
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertFails(
+        setDoc(doc(db, 'posts', 'new-post'), {
+          title: 'Test Post',
+          body: 'Content',
+          authorId: 'alice',
+          status: 'published', // Cannot create as published!
+        })
+      )
+    })
+
+    it('denies creating post without status', async () => {
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertFails(
+        setDoc(doc(db, 'posts', 'new-post'), {
+          title: 'Test Post',
+          body: 'Content',
+          authorId: 'alice',
+          // Missing status field!
         })
       )
     })
@@ -72,6 +174,7 @@ describe('Posts Collection', () => {
           title: 'Test Post',
           body: 'Content',
           authorId: 'bob', // Not alice!
+          status: 'pending',
         })
       )
     })
@@ -85,47 +188,120 @@ describe('Posts Collection', () => {
           title: 'Test Post',
           body: 'Content',
           authorId: 'someone',
+          status: 'pending',
         })
       )
     })
   })
 
   describe('update rules', () => {
-    it('allows author to update their own post', async () => {
-      // Setup: create a post as admin
+    it('allows author to update their own post (keeping status)', async () => {
       await testEnv.withSecurityRulesDisabled(async (context) => {
         const db = context.firestore()
         await setDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Original',
           body: 'Content',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
-      // Test: alice updates her post
       const alice = testEnv.authenticatedContext('alice')
       const db = alice.firestore()
 
       await assertSucceeds(
         updateDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Updated Title',
-          authorId: 'alice', // Must keep same authorId
+          authorId: 'alice',
+          status: 'pending', // Must keep same status
+        })
+      )
+    })
+
+    it('denies author from changing status to published', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'posts', 'alice-post'), {
+          title: 'Original',
+          body: 'Content',
+          authorId: 'alice',
+          status: 'pending',
+        })
+      })
+
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertFails(
+        updateDoc(doc(db, 'posts', 'alice-post'), {
+          title: 'Updated Title',
+          authorId: 'alice',
+          status: 'published', // Cannot self-publish!
+        })
+      )
+    })
+
+    it('allows admin to publish a pending post', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'admin'), {
+          username: 'admin',
+          isAdmin: true,
+        })
+        await setDoc(doc(db, 'posts', 'pending-post'), {
+          title: 'Pending Post',
+          body: 'Content',
+          authorId: 'alice',
+          status: 'pending',
+        })
+      })
+
+      const admin = testEnv.authenticatedContext('admin')
+      const db = admin.firestore()
+
+      await assertSucceeds(
+        updateDoc(doc(db, 'posts', 'pending-post'), {
+          status: 'published',
+        })
+      )
+    })
+
+    it('allows admin to update any post', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'admin'), {
+          username: 'admin',
+          isAdmin: true,
+        })
+        await setDoc(doc(db, 'posts', 'alice-post'), {
+          title: 'Alice Post',
+          body: 'Content',
+          authorId: 'alice',
+          status: 'published',
+        })
+      })
+
+      const admin = testEnv.authenticatedContext('admin')
+      const db = admin.firestore()
+
+      await assertSucceeds(
+        updateDoc(doc(db, 'posts', 'alice-post'), {
+          title: 'Admin Edited',
         })
       )
     })
 
     it('denies changing authorId (Arc-style attack)', async () => {
-      // Setup: create a post owned by alice
       await testEnv.withSecurityRulesDisabled(async (context) => {
         const db = context.firestore()
         await setDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Alice Post',
           body: 'Content',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
-      // Attack: alice tries to change authorId to bob
       const alice = testEnv.authenticatedContext('alice')
       const db = alice.firestore()
 
@@ -133,22 +309,22 @@ describe('Posts Collection', () => {
         updateDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Hacked',
           authorId: 'bob', // Trying to change ownership!
+          status: 'pending',
         })
       )
     })
 
     it('denies other users from updating posts', async () => {
-      // Setup: create a post owned by alice
       await testEnv.withSecurityRulesDisabled(async (context) => {
         const db = context.firestore()
         await setDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Alice Post',
           body: 'Content',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
-      // Test: bob tries to update alice's post
       const bob = testEnv.authenticatedContext('bob')
       const db = bob.firestore()
 
@@ -156,6 +332,7 @@ describe('Posts Collection', () => {
         updateDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Hacked by Bob',
           authorId: 'alice',
+          status: 'pending',
         })
       )
     })

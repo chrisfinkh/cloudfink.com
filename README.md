@@ -1,5 +1,7 @@
 # Vue 3 Blog
 
+Live visit cloudfink.com
+
 A modern blog application built with Vue 3, Firebase, and Tailwind CSS. Features authentication, internationalization, and Markdown support.
 
 ## Features
