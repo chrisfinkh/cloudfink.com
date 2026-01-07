@@ -2,7 +2,10 @@
   <header class="bg-white shadow-soft">
     <div class="container flex items-center justify-between py-4">
       <RouterLink :to="{ name: 'Home', params: { locale } }">
-        <h1 class="text-2xl font-bold text-primary">C529 Blog</h1>
+        <div class="flex items-center">
+          <img src="/favicon.svg" alt="Cloudfink" class="h-12 w-12 -translate-y-[3px]" />
+          <h1 class="text-2xl font-bold text-primary">cloudfink</h1>
+        </div>
       </RouterLink>
       <nav class="flex items-center gap-6">
         <RouterLink
