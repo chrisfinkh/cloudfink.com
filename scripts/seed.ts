@@ -56,6 +56,7 @@ type Post = {
   body: string
   tags: string[]
   authorId: string
+  status?: 'pending' | 'published'
 }
 
 async function clearPosts() {
@@ -120,6 +121,7 @@ async function seedPosts() {
       body: post.body,
       tags: post.tags,
       authorId: post.authorId,
+      status: post.status || 'published',
       createdAt: new Date(),
       updatedAt: new Date(),
     })

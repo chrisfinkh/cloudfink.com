@@ -7,10 +7,11 @@ import {
   updateProfile,
   signOut,
   onAuthStateChanged,
+  deleteUser,
   type User,
   type AuthError
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, collection, query, where, getDocs, writeBatch, serverTimestamp } from 'firebase/firestore'
 import { auth, db } from '@/firebase/config'
 
 // Map Firebase error codes to user-friendly messages
@@ -33,6 +34,7 @@ const getAuthErrorMessage = (error: AuthError): string => {
 
 const user = ref<User | null>(null)
 const username = ref<string | null>(null)
+const isAdmin = ref(false)
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 
@@ -53,11 +55,18 @@ const initAuth = () => {
 
     user.value = u
     if (u) {
-      // Fetch username from Firestore
+      // Fetch username and isAdmin from Firestore
       const userDoc = await getDoc(doc(db, 'users', u.uid))
-      username.value = userDoc.exists() ? userDoc.data().username : null
+      if (userDoc.exists()) {
+        username.value = userDoc.data().username || null
+        isAdmin.value = userDoc.data().isAdmin === true
+      } else {
+        username.value = null
+        isAdmin.value = false
+      }
     } else {
       username.value = null
+      isAdmin.value = false
     }
     isLoading.value = false
 
@@ -175,9 +184,52 @@ export const useAuth = () => {
   // Check if current user needs to set a username
   const needsUsername = computed(() => isLoggedIn.value && !username.value)
 
+  // Delete user account and all associated data
+  const deleteAccount = async (): Promise<boolean> => {
+    error.value = null
+    if (!user.value) {
+      error.value = 'Must be logged in to delete account'
+      return false
+    }
+
+    try {
+      const uid = user.value.uid
+      const currentUsername = username.value
+      const batch = writeBatch(db)
+
+      // Delete all posts by this user
+      const postsQuery = query(collection(db, 'posts'), where('authorId', '==', uid))
+      const postsSnapshot = await getDocs(postsQuery)
+      postsSnapshot.docs.forEach((postDoc) => {
+        batch.delete(postDoc.ref)
+      })
+
+      // Delete username document
+      if (currentUsername) {
+        batch.delete(doc(db, 'usernames', currentUsername))
+      }
+
+      // Delete user document
+      batch.delete(doc(db, 'users', uid))
+
+      // Commit batch delete
+      await batch.commit()
+
+      // Delete Firebase Auth user
+      await deleteUser(user.value)
+
+      return true
+    } catch (e) {
+      error.value = (e as Error).message
+      console.error('Delete account error:', e)
+      return false
+    }
+  }
+
   return {
     user,
     username,
+    isAdmin,
     isLoggedIn,
     isLoading,
     error,
@@ -187,6 +239,7 @@ export const useAuth = () => {
     loginWithEmail,
     signUpWithEmail,
     isUsernameAvailable,
-    claimUsername
+    claimUsername,
+    deleteAccount
   }
 }

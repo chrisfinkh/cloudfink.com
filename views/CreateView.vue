@@ -67,17 +67,21 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import useCreatePost from '@/composables/useCreatePost'
+import { useToast } from '@/composables/useToast'
 
 interface FormData {
   title: string
   body: string
 }
 
+const { t } = useI18n({ useScope: 'global' })
 const route = useRoute()
 const router = useRouter()
 const { error, isPending, createPost } = useCreatePost()
+const { showToast } = useToast()
 
 const tag = ref<string>('')
 const tags = ref<string[]>([])
@@ -102,7 +106,12 @@ const handleSubmit = async (data: FormData) => {
   })
 
   if (postId) {
-    router.push({ name: 'Home', params: { locale: route.params.locale } })
+    showToast({
+      title: t('toast.postCreated.title'),
+      description: t('toast.postCreated.description'),
+      type: 'info'
+    })
+    router.push({ name: 'MyArticles', params: { locale: route.params.locale } })
   }
 }
 </script>

@@ -10,6 +10,9 @@
 
     <article v-if="post" class="rounded-lg bg-white p-8 shadow-card">
       <header class="mb-6">
+        <div v-if="isAuthor && post.status === 'pending'" class="mb-3">
+          <StatusBadge :status="post.status" />
+        </div>
         <h1 class="text-3xl font-bold text-surface-800">{{ post.title }}</h1>
         <p class="mt-2 text-sm text-surface-500">
           by {{ author?.displayName || 'Unknown' }}
@@ -84,6 +87,7 @@ import { useAuth } from '@/composables/useAuth'
 import { useAuthor } from '@/composables/useAuthors'
 import { doc, deleteDoc } from 'firebase/firestore'
 import { db } from '@/firebase/config'
+import StatusBadge from '@/components/StatusBadge.vue'
 
 const props = defineProps<{
   id: string
