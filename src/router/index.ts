@@ -3,6 +3,8 @@ import DetailsView from '../../views/DetailsView.vue'
 import CreateView from '../../views/CreateView.vue'
 import EditView from '../../views/EditView.vue'
 import LoginSignupView from '../../views/LoginSignupView.vue'
+import MyArticlesView from '../../views/MyArticlesView.vue'
+import MyAccountView from '../../views/MyAccountView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { i18n, SUPPORTED_LOCALES, type LocaleCode } from '@/i18n'
 
@@ -33,6 +35,16 @@ const localeRoutes = [
     name: 'Login',
     path: 'login',
     component: LoginSignupView,
+  },
+  {
+    name: 'MyArticles',
+    path: 'my-articles',
+    component: MyArticlesView,
+  },
+  {
+    name: 'MyAccount',
+    path: 'my-account',
+    component: MyAccountView,
   },
 ]
 

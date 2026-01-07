@@ -29,7 +29,7 @@ import { VueSpinnerOval } from 'vue3-spinners'
 const route = useRoute()
 const router = useRouter()
 
-const { posts, error, load } = getPosts()
+const { posts, error, load } = getPosts({ publishedOnly: true })
 const loading = ref(true)
 
 load().then(() => {

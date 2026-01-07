@@ -1,6 +1,5 @@
 {
   "common": {
-    "home": "Home",
     "create": "Create",
     "login": "Login",
     "logout": "Logout",
@@ -9,6 +8,37 @@
     "saving": "Saving...",
     "addPost": "Add Post",
     "saveChanges": "Save Changes"
+  },
+  "status": {
+    "pending": "Pending Review",
+    "published": "Published"
+  },
+  "userMenu": {
+    "myArticles": "My Articles",
+    "myAccount": "My Account"
+  },
+  "myArticles": {
+    "title": "My Articles",
+    "noArticles": "You haven't written any articles yet.",
+    "createFirst": "Create your first article",
+    "viewArticle": "View article"
+  },
+  "myAccount": {
+    "title": "My Account",
+    "accountInfo": "Account Information",
+    "username": "Username",
+    "email": "Email",
+    "displayName": "Display Name",
+    "dangerZone": "Danger Zone",
+    "deleteWarning": "Once you delete your account, there is no going back. All your data and articles will be permanently removed.",
+    "deleteAccount": "Delete Account",
+    "confirmDelete": {
+      "title": "Delete Account?",
+      "description": "This action cannot be undone. Your account and all your articles will be permanently deleted.",
+      "cancel": "Cancel",
+      "confirm": "Yes, delete my account",
+      "deleting": "Deleting..."
+    }
   },
   "auth": {
     "noAccount": "No account yet?",
@@ -74,6 +104,14 @@
     "logoutSuccess": {
       "title": "Goodbye!",
       "description": "You have been logged out."
+    },
+    "postCreated": {
+      "title": "Article submitted!",
+      "description": "Your article will be reviewed by an admin before being published."
+    },
+    "accountDeleted": {
+      "title": "Account deleted",
+      "description": "Your account and all data have been removed."
     }
   }
 }

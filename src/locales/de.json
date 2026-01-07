@@ -1,6 +1,5 @@
 {
   "common": {
-    "home": "Startseite",
     "create": "Erstellen",
     "login": "Anmelden",
     "logout": "Abmelden",
@@ -9,6 +8,37 @@
     "saving": "Speichern...",
     "addPost": "Beitrag hinzufügen",
     "saveChanges": "Änderungen speichern"
+  },
+  "status": {
+    "pending": "Ausstehend",
+    "published": "Veröffentlicht"
+  },
+  "userMenu": {
+    "myArticles": "Meine Artikel",
+    "myAccount": "Mein Konto"
+  },
+  "myArticles": {
+    "title": "Meine Artikel",
+    "noArticles": "Du hast noch keine Artikel geschrieben.",
+    "createFirst": "Erstelle deinen ersten Artikel",
+    "viewArticle": "Artikel ansehen"
+  },
+  "myAccount": {
+    "title": "Mein Konto",
+    "accountInfo": "Kontoinformationen",
+    "username": "Benutzername",
+    "email": "E-Mail",
+    "displayName": "Anzeigename",
+    "dangerZone": "Gefahrenzone",
+    "deleteWarning": "Sobald du dein Konto löschst, gibt es kein Zurück mehr. Alle deine Daten und Artikel werden dauerhaft entfernt.",
+    "deleteAccount": "Konto löschen",
+    "confirmDelete": {
+      "title": "Konto löschen?",
+      "description": "Diese Aktion kann nicht rückgängig gemacht werden. Dein Konto und alle deine Artikel werden dauerhaft gelöscht.",
+      "cancel": "Abbrechen",
+      "confirm": "Ja, mein Konto löschen",
+      "deleting": "Löschen..."
+    }
   },
   "auth": {
     "noAccount": "Noch kein Konto?",
@@ -74,6 +104,14 @@
     "logoutSuccess": {
       "title": "Auf Wiedersehen!",
       "description": "Du wurdest abgemeldet."
+    },
+    "postCreated": {
+      "title": "Artikel eingereicht!",
+      "description": "Dein Artikel wird von einem Admin geprüft, bevor er veröffentlicht wird."
+    },
+    "accountDeleted": {
+      "title": "Konto gelöscht",
+      "description": "Dein Konto und alle Daten wurden entfernt."
     }
   }
 }

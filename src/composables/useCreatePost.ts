@@ -3,7 +3,7 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
 import { db, auth } from '../firebase/config'
 import type { Post } from '@/types/Post'
 
-type NewPost = Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'authorId'>
+type NewPost = Omit<Post, 'id' | 'createdAt' | 'updatedAt' | 'authorId' | 'status'>
 
 const useCreatePost = () => {
   const error = ref<string | null>(null)
@@ -23,6 +23,7 @@ const useCreatePost = () => {
       const docRef = await addDoc(collection(db, 'posts'), {
         ...post,
         authorId: auth.currentUser.uid,
+        status: 'pending',
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       })
