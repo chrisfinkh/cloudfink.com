@@ -7,13 +7,7 @@
           <h1 class="text-2xl font-bold text-primary">cloudfink</h1>
         </div>
       </RouterLink>
-      <nav class="flex items-center gap-6">
-        <RouterLink
-          :to="{ name: 'Home', params: { locale } }"
-          class="text-surface-800 transition-colors hover:text-primary"
-        >
-          {{ $t('common.home') }}
-        </RouterLink>
+      <nav class="flex items-center gap-1">
         <RouterLink
           v-if="isLoggedIn"
           :to="{ name: 'Create', params: { locale } }"

@@ -1,6 +1,5 @@
 {
   "common": {
-    "home": "Home",
     "create": "Create",
     "login": "Login",
     "logout": "Logout",
