@@ -9,7 +9,7 @@
           : 'bg-surface-200 text-surface-600 hover:bg-surface-300',
       ]"
     >
-      All
+      {{ t('home.all') }}
     </button>
     <button
       v-for="tag in tags"
@@ -28,6 +28,10 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 const emit = defineEmits<{
   filterChanged: [tag: string | null]
 }>()
