@@ -23,7 +23,7 @@
       </div>
 
       <p class="mt-4 flex items-center gap-1 text-sm font-medium text-primary">
-        Read the article →
+        {{ t('home.readArticle') }} →
       </p>
     </div>
   </article>

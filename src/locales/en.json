@@ -67,7 +67,9 @@
   "home": {
     "latestPosts": "Latest Posts",
     "noPostsFound": "No posts found for this tag.",
-    "byAuthor": "by {author}"
+    "byAuthor": "by {author}",
+    "readArticle": "Read the article",
+    "all": "All"
   },
   "detail": {
     "backToPosts": "Back to posts",
