@@ -5,7 +5,7 @@ import {
   assertFails,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing'
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, getDocs, collection } from 'firebase/firestore'
 import { readFileSync } from 'fs'
 import { firebaseConfig } from '../src/firebase/firebaseConfig'
 
@@ -191,39 +191,223 @@ describe('Posts Collection', () => {
 
       await assertFails(deleteDoc(doc(db, 'posts', 'alice-post')))
     })
+
+    it('allows admin to delete any post', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'admin'), {
+          username: 'admin',
+          isAdmin: true,
+        })
+        await setDoc(doc(db, 'posts', 'alice-post'), {
+          title: 'Alice Post',
+          authorId: 'alice',
+        })
+      })
+
+      const admin = testEnv.authenticatedContext('admin')
+      const db = admin.firestore()
+
+      await assertSucceeds(deleteDoc(doc(db, 'posts', 'alice-post')))
+    })
+
+    it('denies unauthenticated users from deleting posts', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'posts', 'some-post'), {
+          title: 'Some Post',
+          authorId: 'alice',
+        })
+      })
+
+      const unauthed = testEnv.unauthenticatedContext()
+      const db = unauthed.firestore()
+
+      await assertFails(deleteDoc(doc(db, 'posts', 'some-post')))
+    })
   })
 })
 
 describe('Users Collection', () => {
-  it('allows anyone to read user profiles', async () => {
-    const unauthed = testEnv.unauthenticatedContext()
-    const db = unauthed.firestore()
+  describe('read rules', () => {
+    it('allows anyone to read user profiles', async () => {
+      const unauthed = testEnv.unauthenticatedContext()
+      const db = unauthed.firestore()
 
-    await assertSucceeds(getDoc(doc(db, 'users', 'some-user')))
+      await assertSucceeds(getDoc(doc(db, 'users', 'some-user')))
+    })
   })
 
-  it('allows user to write their own profile', async () => {
-    const alice = testEnv.authenticatedContext('alice')
-    const db = alice.firestore()
+  describe('create rules', () => {
+    it('allows user to create their own profile', async () => {
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
 
-    await assertSucceeds(
-      setDoc(doc(db, 'users', 'alice'), {
-        username: 'alice123',
-        displayName: 'Alice',
-      })
-    )
+      await assertSucceeds(
+        setDoc(doc(db, 'users', 'alice'), {
+          username: 'alice123',
+          displayName: 'Alice',
+        })
+      )
+    })
+
+    it('denies creating other user profiles', async () => {
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertFails(
+        setDoc(doc(db, 'users', 'bob'), {
+          username: 'hacked',
+          displayName: 'Hacked',
+        })
+      )
+    })
+
+    it('denies creating profile with isAdmin field', async () => {
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertFails(
+        setDoc(doc(db, 'users', 'alice'), {
+          username: 'alice123',
+          displayName: 'Alice',
+          isAdmin: true,
+        })
+      )
+    })
   })
 
-  it('denies writing to other user profiles', async () => {
-    const alice = testEnv.authenticatedContext('alice')
-    const db = alice.firestore()
-
-    await assertFails(
-      setDoc(doc(db, 'users', 'bob'), {
-        username: 'hacked',
-        displayName: 'Hacked',
+  describe('update rules', () => {
+    it('allows user to update their own profile', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'alice'), {
+          username: 'alice123',
+          displayName: 'Alice',
+        })
       })
-    )
+
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertSucceeds(
+        updateDoc(doc(db, 'users', 'alice'), {
+          displayName: 'Alice Updated',
+        })
+      )
+    })
+
+    it('denies updating other user profiles', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'bob'), {
+          username: 'bob123',
+          displayName: 'Bob',
+        })
+      })
+
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertFails(
+        updateDoc(doc(db, 'users', 'bob'), {
+          displayName: 'Hacked',
+        })
+      )
+    })
+
+    it('denies adding isAdmin field on update', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'alice'), {
+          username: 'alice123',
+          displayName: 'Alice',
+        })
+      })
+
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertFails(
+        updateDoc(doc(db, 'users', 'alice'), {
+          displayName: 'Alice',
+          isAdmin: true,
+        })
+      )
+    })
+
+    it('denies changing existing isAdmin field', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'alice'), {
+          username: 'alice123',
+          displayName: 'Alice',
+          isAdmin: false,
+        })
+      })
+
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertFails(
+        updateDoc(doc(db, 'users', 'alice'), {
+          isAdmin: true,
+        })
+      )
+    })
+
+    it('allows update when isAdmin stays the same', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'alice'), {
+          username: 'alice123',
+          displayName: 'Alice',
+          isAdmin: false,
+        })
+      })
+
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertSucceeds(
+        updateDoc(doc(db, 'users', 'alice'), {
+          displayName: 'Alice Updated',
+          isAdmin: false,
+        })
+      )
+    })
+  })
+
+  describe('delete rules', () => {
+    it('allows user to delete their own profile', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'alice'), {
+          username: 'alice123',
+          displayName: 'Alice',
+        })
+      })
+
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertSucceeds(deleteDoc(doc(db, 'users', 'alice')))
+    })
+
+    it('denies deleting other user profiles', async () => {
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'users', 'bob'), {
+          username: 'bob123',
+          displayName: 'Bob',
+        })
+      })
+
+      const alice = testEnv.authenticatedContext('alice')
+      const db = alice.firestore()
+
+      await assertFails(deleteDoc(doc(db, 'users', 'bob')))
+    })
   })
 })
 
@@ -277,10 +461,10 @@ describe('Usernames Collection', () => {
     )
   })
 
-  it('denies deleting usernames', async () => {
+  it('allows owner to delete their username', async () => {
     await testEnv.withSecurityRulesDisabled(async (context) => {
       const db = context.firestore()
-      await setDoc(doc(db, 'usernames', 'permanent'), {
+      await setDoc(doc(db, 'usernames', 'alicename'), {
         uid: 'alice',
       })
     })
@@ -288,6 +472,34 @@ describe('Usernames Collection', () => {
     const alice = testEnv.authenticatedContext('alice')
     const db = alice.firestore()
 
-    await assertFails(deleteDoc(doc(db, 'usernames', 'permanent')))
+    await assertSucceeds(deleteDoc(doc(db, 'usernames', 'alicename')))
+  })
+
+  it('denies other users from deleting usernames', async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore()
+      await setDoc(doc(db, 'usernames', 'alicename'), {
+        uid: 'alice',
+      })
+    })
+
+    const bob = testEnv.authenticatedContext('bob')
+    const db = bob.firestore()
+
+    await assertFails(deleteDoc(doc(db, 'usernames', 'alicename')))
+  })
+
+  it('denies unauthenticated users from deleting usernames', async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const db = context.firestore()
+      await setDoc(doc(db, 'usernames', 'somename'), {
+        uid: 'alice',
+      })
+    })
+
+    const unauthed = testEnv.unauthenticatedContext()
+    const db = unauthed.firestore()
+
+    await assertFails(deleteDoc(doc(db, 'usernames', 'somename')))
   })
 })
