@@ -84,8 +84,8 @@ async function seedTestUser() {
       displayName: TEST_USER.displayName,
     })
     console.log(`✅ Created auth user: ${TEST_USER.email}`)
-  } catch (error: any) {
-    if (error.code === 'auth/uid-already-exists') {
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'auth/uid-already-exists') {
       console.log(`ℹ️  Auth user already exists: ${TEST_USER.email}`)
     } else {
       throw error
