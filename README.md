@@ -8,10 +8,16 @@ A modern blog application built with Vue 3, Firebase, and Tailwind CSS. Features
 ## Features
 
 - **Authentication** - Google and Email/Password login via Firebase Auth
-- **Internationalization** - English and German with language switcher
-- **Markdown Posts** - Write posts in Markdown with live rendering
+- **Username System** - Unique usernames with real-time availability checking
+- **Publishing Workflow** - Posts start as "pending" until approved by admins
+- **Admin Role** - Admins can publish/unpublish posts
 - **Author Controls** - Edit and delete your own posts
+- **Account Deletion** - Full cascade delete (posts, username, user data)
+- **Internationalization** - English and German with language switcher
+- **Markdown Posts** - Write posts in Markdown
+- **Toast Notifications** - User feedback via radix-vue toasts
 - **Responsive Design** - Mobile-friendly layout with Tailwind CSS
+- **Security Rules** - Firestore rules with comprehensive test coverage
 
 ## Tech Stack
 
@@ -21,6 +27,26 @@ A modern blog application built with Vue 3, Firebase, and Tailwind CSS. Features
 - vue-i18n
 - radix-vue
 - marked + DOMPurify
+
+## Accessibility
+
+Built with accessibility in mind:
+
+- **radix-vue** - WAI-ARIA compliant UI primitives with keyboard navigation and screen reader support
+- **FormKit** - Accessible forms with proper labeling and error announcements
+- **Semantic HTML** - Proper use of `<header>`, `<nav>`, `<main>`, `<article>`, and heading hierarchy
+
+## Security Note
+
+> **The Firebase API key is intentionally public.** This is safe and by design.
+
+Firebase API keys are **not secrets**. Unlike traditional API keys, they only identify your Firebase project to Google's servers. The actual security is enforced by:
+
+1. **Firestore Security Rules** - Define who can read/write what data (see `firestore.rules`)
+2. **Firebase Authentication** - Validates user identity server-side
+3. **Server-side validation** - All rules are enforced by Firebase, not the client
+
+This is [how Firebase is designed to work](https://firebase.google.com/docs/projects/api-keys). The rules in this project are tested with `@firebase/rules-unit-testing` - run `npm run test:rules` to verify.
 
 ## Getting Started
 
@@ -68,6 +94,13 @@ npm run build
 
 ```sh
 npm run lint
+```
+
+### Testing
+
+```sh
+npm run test        # Run all tests
+npm run test:rules  # Run Firestore security rules tests only
 ```
 
 ## Project Structure
