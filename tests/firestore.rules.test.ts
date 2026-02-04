@@ -5,7 +5,7 @@ import {
   assertFails,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing'
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, getDocs, collection } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, getDocs, collection, query, where } from 'firebase/firestore'
 import { readFileSync } from 'fs'
 import { firebaseConfig } from '../src/firebase/firebaseConfig'
 
@@ -34,18 +34,41 @@ beforeEach(async () => {
 
 describe('Posts Collection', () => {
   describe('read rules', () => {
-    it('allows anyone to read posts', async () => {
+    it('allows anyone to read published posts', async () => {
+      // Setup: create a published post
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'posts', 'test-post'), {
+          title: 'Test Post',
+          body: 'Content',
+          authorId: 'alice',
+          status: 'published',
+        })
+      })
+
       const unauthed = testEnv.unauthenticatedContext()
       const db = unauthed.firestore()
 
       await assertSucceeds(getDoc(doc(db, 'posts', 'test-post')))
     })
 
-    it('allows anyone to list posts', async () => {
+    it('allows anyone to list published posts', async () => {
+      // Setup: create a published post
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const db = context.firestore()
+        await setDoc(doc(db, 'posts', 'published-post'), {
+          title: 'Published Post',
+          body: 'Content',
+          authorId: 'alice',
+          status: 'published',
+        })
+      })
+
       const unauthed = testEnv.unauthenticatedContext()
       const db = unauthed.firestore()
 
-      await assertSucceeds(getDocs(collection(db, 'posts')))
+      // Query must filter by status to match security rule
+      await assertSucceeds(getDocs(query(collection(db, 'posts'), where('status', '==', 'published'))))
     })
   })
 
@@ -59,6 +82,7 @@ describe('Posts Collection', () => {
           title: 'Test Post',
           body: 'Content',
           authorId: 'alice',
+          status: 'pending',
         })
       )
     })
@@ -72,6 +96,7 @@ describe('Posts Collection', () => {
           title: 'Test Post',
           body: 'Content',
           authorId: 'bob', // Not alice!
+          status: 'pending',
         })
       )
     })
@@ -85,6 +110,7 @@ describe('Posts Collection', () => {
           title: 'Test Post',
           body: 'Content',
           authorId: 'someone',
+          status: 'pending',
         })
       )
     })
@@ -99,6 +125,7 @@ describe('Posts Collection', () => {
           title: 'Original',
           body: 'Content',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
@@ -110,6 +137,7 @@ describe('Posts Collection', () => {
         updateDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Updated Title',
           authorId: 'alice', // Must keep same authorId
+          status: 'pending', // Must keep same status
         })
       )
     })
@@ -122,6 +150,7 @@ describe('Posts Collection', () => {
           title: 'Alice Post',
           body: 'Content',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
@@ -133,6 +162,7 @@ describe('Posts Collection', () => {
         updateDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Hacked',
           authorId: 'bob', // Trying to change ownership!
+          status: 'pending',
         })
       )
     })
@@ -145,6 +175,7 @@ describe('Posts Collection', () => {
           title: 'Alice Post',
           body: 'Content',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
@@ -156,6 +187,7 @@ describe('Posts Collection', () => {
         updateDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Hacked by Bob',
           authorId: 'alice',
+          status: 'pending',
         })
       )
     })
@@ -168,6 +200,7 @@ describe('Posts Collection', () => {
         await setDoc(doc(db, 'posts', 'alice-post'), {
           title: 'To Delete',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
@@ -183,6 +216,7 @@ describe('Posts Collection', () => {
         await setDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Protected',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
@@ -202,6 +236,7 @@ describe('Posts Collection', () => {
         await setDoc(doc(db, 'posts', 'alice-post'), {
           title: 'Alice Post',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
@@ -217,6 +252,7 @@ describe('Posts Collection', () => {
         await setDoc(doc(db, 'posts', 'some-post'), {
           title: 'Some Post',
           authorId: 'alice',
+          status: 'pending',
         })
       })
 
