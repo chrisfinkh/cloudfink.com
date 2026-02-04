@@ -5,7 +5,7 @@ import {
   assertFails,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing'
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, getDocs, collection } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, getDocs, collection, query, where } from 'firebase/firestore'
 import { readFileSync } from 'fs'
 import { firebaseConfig } from '../src/firebase/firebaseConfig'
 
@@ -67,7 +67,8 @@ describe('Posts Collection', () => {
       const unauthed = testEnv.unauthenticatedContext()
       const db = unauthed.firestore()
 
-      await assertSucceeds(getDocs(collection(db, 'posts')))
+      // Query must filter by status to match security rule
+      await assertSucceeds(getDocs(query(collection(db, 'posts'), where('status', '==', 'published'))))
     })
   })
 
